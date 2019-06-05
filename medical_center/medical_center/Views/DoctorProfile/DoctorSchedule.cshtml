@@ -1,0 +1,85 @@
+﻿@model IEnumerable<MED.ViewModels.ScheduleViewModel>
+
+<link href="~/Content/jquery.timepicker.css" rel="stylesheet" />
+<script src="~/Scripts/jquery-3.3.1.js"></script>
+
+<script src="~/Scripts/jquery.timepicker.js"></script>
+<link href="~/Content/font-awesome.css" rel="stylesheet" />
+
+@foreach (var item in Model)
+{
+    <div class="schedule" >
+        <span class="icon"><i class="icon-calendar3"></i></span>
+        <div class="desc">
+            <div class="form-inline">
+                <span>@item.Day</span>
+                @Html.CheckBoxFor(m => item.IsWorking, new { @class = @item.Day + " checkbox eventControl" })
+            </div>
+            <div class="form-inline">
+                @Html.HiddenFor(m => item.Id, new { @class = @item.Day + " form-control eventControl" })
+            </div>
+            <div class="form-inline" style="display: inline-block;">
+                Lunch:
+                @Html.TextBoxFor(m => item.LunchStart, "{0:HH-mm}", new { @class = @item.Day + " form-control timepicker eventControl ", style = "width: 100px; height: 40px" })
+                -
+                @Html.TextBoxFor(m => item.LunchEnd, "{0:HH-mm}", new { @class = @item.Day + " form-control timepicker eventControl ", style = "width: 100px; height: 40px" })
+            </div>
+            <br />
+            <br />
+            <div class="form-inline" style="display: inline-block;">
+                Work:
+                @Html.TextBoxFor(m => item.WorkStart, "{0:HH-mm}", new { @class = @item.Day + " form-control timepicker eventControl ", style = "width: 100px; height: 40px" })
+                -
+                @Html.TextBoxFor(m => item.WorkEnd, "{0:HH-mm}", new { @class = @item.Day + " form-control timepicker eventControl ", style = "width: 100px; height: 40px" })
+            </div>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.noConflict();
+        $('.eventControl').change(function() {
+            var myClass = $(this).attr("class");
+            var weekDayClass = myClass.substr(0, myClass.indexOf(' '));
+
+            var workDay = {
+                Id: $("#item_Id." + weekDayClass).val(),
+                Day: weekDayClass,
+                IsWorking: $("#item_IsWorking." + weekDayClass).prop('checked'),
+                LunchStart: $("#item_LunchStart." + weekDayClass).val(),
+                LunchEnd: $("#item_LunchEnd." + weekDayClass).val(),
+                WorkStart: $("#item_WorkStart." + weekDayClass).val(),
+                WorkEnd: $("#item_WorkEnd." + weekDayClass).val()
+            };
+            $.ajax({
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+                type: "post",
+                url: '@Url.Action("UpdateSchedule", "DoctorProfile")',
+                data: JSON.stringify(workDay),
+                success: function (res) {
+                    if (res.success == "Invalid") {
+                        alert(res.responseText);
+                        $("#item_IsWorking." + weekDayClass).prop('checked', true);
+                    }
+                },
+                error: function (res) {
+                    alert(res.responseText);
+                }
+            });
+        });
+
+        $('.timepicker').timepicker({
+
+            step: 60,
+            minTime: '8',
+            maxTime: '8:00pm',
+            defaultTime: '11',
+            startTime: '10:00',
+            dynamic: false,
+            dropdown: true,
+            scrollbar: true
+        });
+    });
+</script>

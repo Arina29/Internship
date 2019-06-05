@@ -1,0 +1,153 @@
+﻿@using Microsoft.AspNet.Identity
+@model MED.ViewModels.PatientFormViewModels
+
+@{
+    ViewBag.Title = "PatientProfile";
+}
+<link href="~/Content/font-awesome.css" rel="stylesheet" />
+<script src="~/Scripts/jquery-3.3.1.js"></script>
+
+<br />
+
+<div class="row" style="margin-left: 50px">
+    @Html.HiddenFor(m => m.Id)
+<div class="row">
+    <div class="col-sm-4">
+        @if (Model.Image1.Length > 0)
+        {
+            <img src="@String.Format("data:image/png;base64,{0}", Convert.ToBase64String(Model.Image1))" width="300px" height="270px" />
+        }
+        else
+        {
+            <img id="profileImg" src="~/assets/avatar.png" alt="No image" width="300px" height="270"  />
+        }
+    </div>
+
+    <div class="col">
+        <label>Name: </label> @Model.Name @Model.Surname<br />
+        <label>Gender: </label> @Model.Gender<br />
+        <label>Age:</label> @Model.Age <br />
+        <label>Email: </label> @Model.Mail<br />
+        <label>Mobile: </label>  @Model.Mobile<br />
+        @if (User.IsInRole("User"))
+        {
+            <div class="card-footer text-muted">
+                <a class="btn btn-primary" href="@Url.Action("RegisterPatientForm", "PatientForm", new {UserId = Model.UserId})"><span class="fa fa-cog"></span> Settings</a>
+                <a class ="btn btn-primary" href ="@Url.Action("PersonalAppointments", "PatientForm", new {Id = Model.Id})"><span class="fa fa-bell"> </span>My appointments</a>
+            </div>
+        }
+        else if (User.IsInRole("Doctor"))
+        {
+            <div class="card-footer text-muted">
+                <button id="AddDiagnosis" data-toggle="modal" align="center" class="btn btn-primary" data-target="#modal-1">
+                    <span class="fa fa-plus"></span> Add Diagnosis
+                </button>                
+            </div>
+        }
+    </div>
+</div>
+</div>
+<br/>
+<br/>
+
+@*----------------------------------------------------------------Modal for Doctors-----------------------------------------------------*@
+
+@using (@Html.BeginForm("AddDiagnosis", "PatientForm", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal" }))
+{
+    <div class="modal" id="modal-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Diagnosis</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group" height="20px">
+                        @Html.LabelFor(m => m.Diagnosis.DiagnosticDate, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(m => m.Diagnosis.DiagnosticDate, "{0:yyyy-MM-dd}", new { @class = "form-control datepicker", type = "date", id = "DiagnosisDate"})
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Diagnosis.Diagnostics, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(m => m.Diagnosis.Diagnostics, new { @class = "form-control", id = "DiagnosisName", rows = "5" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Diagnosis.Recipe, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.TextAreaFor(m => m.Diagnosis.Recipe, new { @class = "form-control", id = "DiagnosisRecipe", rows = "5" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Diagnosis.Symptoms, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.TextAreaFor(m => m.Diagnosis.Symptoms, new { @class = "form-control", id = "DiagnosisSymptoms", rows = "5" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Diagnosis.DiseaseTypes, new {@class = "col-md-2 control-label"})
+                        <div class="col-md-10">
+                            @foreach (var type in Model.Diagnosis.DiseaseTypes)
+                            {
+                                <label class="form-control">@Html.RadioButtonFor(m => m.Diagnosis.DiseaseType, type.Id, new {id = "DiseaseType"}) @type.Name</label>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="saveDiagnosis">Save</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<h2 align="center">Medical Book</h2>
+@Html.Partial("_PatientBook", Model.MedicalBook)
+
+
+<script type="text/javascript">
+    var currentDate = new Date();
+    var year = currentDate.getFullYear();
+    var month = currentDate.getMonth();
+    var day = currentDate.getDay();
+
+
+    $(document).ready(function () {
+        document.getElementById('DiagnosisDate').valueAsDate = new Date();
+        $('#saveDiagnosis').click(function() {
+            var diagnosis = {
+                DiagnosticDate: $("#DiagnosisDate").val(),
+                Diagnostics: $("#DiagnosisName").val(),
+                Recipe: $("#DiagnosisRecipe").val(),
+                Symptoms: $("#DiagnosisSymptoms").val(),
+                DiseaseType: $('input[id=DiseaseType]:checked').val(),
+                PatientId: $("#Id").val()
+            }
+
+
+            $.ajax({
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+                type: "post",
+                url: '@Url.Action("AddDiagnosis", "PatientForm")',
+                data: JSON.stringify(diagnosis),
+                success: function(res) {
+                    window.location.href = res.newUrl;
+                },
+                error: function(res) {
+                    window.location.href = res.newUrl;
+                }
+            });
+        });
+    });
+</script>

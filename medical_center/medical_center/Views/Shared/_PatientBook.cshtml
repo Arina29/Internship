@@ -1,0 +1,269 @@
+﻿@using System.Activities.Expressions
+@using Microsoft.AspNet.Identity
+@model MED.ViewModels.MedicalBookViewModel
+
+<ul class="nav nav-tabs">
+    <li class="nav-item active">
+        <a class="nav-link active show " aria-expanded="true" data-toggle="tab" href="#diagnosis">Diagnosis</a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link " data-toggle="tab" href="#infectious">Infectious diseases</a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#chronic">Chronic diseases</a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#analysis">Analysis Result</a>
+    </li>
+</ul>
+<div id="myTabContent" class="tab-content">
+    <div class="tab-pane fade active in" id="diagnosis">
+        @foreach (var item in Model.Book)
+        {
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="headingOne">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" style="height: 50px" data-parent="#accordion" href="#@item.Id" aria-expanded="false" aria-controls="collapseOne" class="collapsed">
+                            <div class="col-sm-4">
+                                @Html.DisplayFor(m => @item.DiagnosticDate)
+                            </div>
+                            <div class="col-sm-4">
+                                Diagnosis: @item.Diagnostics
+                            </div>
+                            <div class="col-sm-4">
+                                Doctor: @item.Doctor
+                            </div>
+                        </a>
+                    </h4>
+                </div>
+                <div id="@item.Id" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne" style="height: 0px;">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p>
+                                    <label>Symptoms</label><br />
+                                    @item.Symptoms
+                                </p>
+                            </div>
+                            <div class="col-md-4">
+                                <p>
+                                    <label>Recipe</label><br />
+
+                                    @item.Recipe
+                                </p>
+                            </div>
+                            @if (item.DiseaseTypeName != "Neither")
+                            {
+                                <div class="col-md-4">
+                                    <p>
+                                        <label>DiseaseType</label><br />
+
+                                        @item.DiseaseTypeName
+                                    </p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+
+    @*--------------------------------------------------------------Infectious tab---------------------------------------------------*@
+    <div class="tab-pane fade active show" id="infectious">
+        @if (Model.Book.All(x => x.DiseaseTypeName != "Infectious"))
+        {
+            <p>There are no infectious diseases </p>
+        }
+        @foreach (var item in Model.Book)
+        {
+            if (item.DiseaseTypeName == "Infectious")
+            {
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="headingOne">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" style="height: 50px" data-parent="#accordion" href="#@item.Id" aria-expanded="false" aria-controls="collapseOne" class="collapsed">
+                                <div class="col-sm-4">
+                                    @Html.DisplayFor(m => @item.DiagnosticDate)
+                                </div>
+                                <div class="col-sm-4">
+                                    Diagnosis: @item.Diagnostics
+                                </div>
+                                <div class="col-sm-4">
+                                    Doctor: @item.Doctor
+                                </div>
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="@item.Id" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne" style="height: 0px;">
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <p>
+                                        <label>Symptoms</label><br />
+                                        @item.Symptoms
+                                    </p>
+                                </div>
+                                <div class="col-md-4">
+                                    <p>
+                                        <label>Recipe</label><br />
+
+                                        @item.Recipe
+                                    </p>
+                                </div>
+                                @if (item.DiseaseTypeName != "Neither")
+                                {
+                                    <div class="col-md-4">
+                                        <p>
+                                            <label>DiseaseType</label><br />
+                                            @item.DiseaseTypeName
+                                        </p>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    @*---------------------------------------------------Chronic tab-------------------------------------------------*@
+    <div class="tab-pane fade" id="chronic">
+        @foreach (var item in Model.Book)
+        {
+            if (item.DiseaseTypeName == "Chronic")
+            {
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="headingOne">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" style="height: 50px" data-parent="#accordion" href="#@(item.Id + "chronic")" aria-expanded="false" aria-controls="collapseOne" class="collapsed">
+                                <div class="col-sm-4">
+                                    @Html.DisplayFor(m => @item.DiagnosticDate)
+                                </div>
+                                <div class="col-sm-4">
+                                    Diagnosis: @item.Diagnostics
+                                </div>
+                                <div class="col-sm-4">
+                                    Doctor: @item.Doctor
+                                </div>
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="@(item.Id + "chronic")" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne" style="height: 0px;">
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <p>
+                                        <label>Symptoms</label><br />
+                                        @item.Symptoms
+                                    </p>
+                                </div>
+                                <div class="col-md-4">
+                                    <p>
+                                        <label>Recipe</label><br />
+
+                                        @item.Recipe
+                                    </p>
+                                </div>
+                                @if (item.DiseaseTypeName != "Neither")
+                                {
+                                    <div class="col-md-4">
+                                        <p>
+                                            <label>DiseaseType</label><br />
+
+                                            @item.DiseaseTypeName
+                                        </p>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <div class="tab-pane fade" id="analysis">
+        <form id="uploader" enctype="multipart/form-data">
+            <table class ="table-hover table-bordered">
+                <thead>
+                <tr>
+                    <th scope="col" id="analysisName">Analysis</th>
+
+                    <th scope="col" id="CreateTime">Create Date</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model.Analysis)
+                {
+                    <tr>
+                        <td style ="padding-left: 50px; padding-right: 50px">
+                            @Html.ActionLink("Analysis Result", "OpenAnalysis", "PatientForm", new { id = item.Id }, new { target = "_blank" })
+                        </td>
+
+                        <td style ="padding-left: 50px; padding-right: 50px">
+                            @Html.Encode(item.CreateTime.Day + "/" + item.CreateTime.Month + "/" + item.CreateTime.Year)
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+            <br/>
+            @if (User.IsInRole("Doctor"))
+            {
+                <a class="nav-link btn btn-primary" style="margin-left: 150px" data-toggle="tab" href="#Add">Add analysis</a>
+                <div class="tab-pane fade" id="Add">
+                    <div class="input-group">
+                        @Html.TextBoxFor(m => m.Analysis.FirstOrDefault().File, new {@type = "file", name = "File"})
+                        @Html.HiddenFor(m => Model.Id)
+                    </div>
+                    <div align="center">
+                        <button type="submit" class="btn btn-primary save"> Save </button>
+                    </div>
+                    <br/>
+                </div>
+            }
+        </form>
+    </div>
+</div>
+    
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#File").change(function() {
+
+            var fileU = $('#File').get(0);
+            var fileUpload = fileU.files;
+
+
+            var filedata = new FormData();
+
+            if (fileU.files.length > 0) {
+                for (var i = 0; i < fileU.files.length; i++) {
+                    filedata.append("file", fileUpload[i]);
+                    filedata.append("guid",  $("#Id").val());
+                }
+            }
+
+            $.ajax({
+                url: '@Url.Action("AddAnalysis", "DoctorProfile")',
+                type: 'POST',
+                data: filedata ,
+                dataType: 'json',
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    //alert("ABC");
+                },
+                error: function(data) {
+                    //alert("CDEFG");
+                }
+            });
+        });
+    });
+</script>

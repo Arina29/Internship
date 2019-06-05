@@ -1,0 +1,47 @@
+﻿@{
+    ViewBag.Title = "About";
+}
+<script src="~/Scripts/jquery-3.3.1.js"></script>
+
+<div id="colorlib-counter" class="colorlib-counters" style="background-image: url(images/img_bg_2.jpg);" data-stellar-background-ratio="0.5">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <div class="row">
+                    <div class="col-md-4 col-sm-8 text-center animate-box">
+                        <span class="icon"><i class="flaticon-healthy"></i></span>
+                        <span  id ="patients"class="colorlib-counter js-counter" data-from="0" data-speed="1000" data-refresh-interval="50"></span>
+                        <span class="colorlib-counter-label">Registered Patients</span>
+                    </div>
+                    <div class="col-md-4 col-sm-8 text-center animate-box">
+                        <span class="icon"><i class="flaticon-hospital"></i></span>
+                        <span id="appointments" class="colorlib-counter js-counter" data-from="0"  data-speed="1000" data-refresh-interval="50"></span>
+                        <span class="colorlib-counter-label">Appointments</span>
+                    </div>
+                    <div class="col-md-4 col-sm-8 text-center animate-box">
+                        <span class="icon"><i class="flaticon-healthy-1"></i></span>
+                        <span id="doctors" class="colorlib-counter js-counter" data-from="0" data-speed="1000" data-refresh-interval="50"></span>
+                        <span class="colorlib-counter-label">Doctors</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $.ajax({
+            url:'@Url.Action("CountInfo", "Manage")',
+            context: document.body,
+            success: function (response) {
+                $("#patients").attr("data-to", response.Data[1])
+                $("#appointments").attr("data-to", response.Data[2])
+                $("#doctors").attr("data-to", response.Data[0])
+
+            }
+        });
+    });
+</script>

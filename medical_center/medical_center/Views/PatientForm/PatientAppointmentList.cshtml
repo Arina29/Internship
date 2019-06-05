@@ -1,0 +1,47 @@
+﻿@model IEnumerable<MED.ViewModels.AppointmentViewModel>
+
+<table class="table">
+    @Html.HiddenFor(x => x.FirstOrDefault().PatientId)
+    <tr>
+        <th>
+            <label>Date</label>
+        </th>
+        <th>
+            <label>Time</label>
+        </th>
+        <th>
+            <label>Doctor</label>
+        </th>
+        <th>
+            <label>DoctorSpecialization</label>
+        </th>
+        <th>
+            <label>Canceled</label>
+        </th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.Encode(item.Date.Day + "/" + item.Date.Month + "/" + item.Date.Year)
+            </td>
+
+            <td>
+                @Html.Encode(item.Date.Hour + ":00")
+            </td>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.Doctor)
+            </td>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.DoctorSpecialty)
+            </td>
+
+            <td>
+                @Html.ActionLink("Cancel", "DeleteAppointment", "PatientForm", new {Id = item.Id}, new{@class = "btn btn-danger"})
+            </td>
+        </tr>
+    }
+
+</table>

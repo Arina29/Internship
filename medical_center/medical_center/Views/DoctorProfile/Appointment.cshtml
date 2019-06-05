@@ -1,0 +1,193 @@
+﻿
+@model MED.ViewModels.AppointmentViewModel
+<script src="~/Scripts/jquery-3.3.1.js"></script>
+<link href="~/Content/jquery.datetimepicker.css" rel="stylesheet" />
+<script src="~/Scripts/jquery.datetimepicker.js"></script>
+<div class="colorlib-loader"></div>
+<div id="page">
+    <div id="colorlib-contact">
+        <div class="container">
+            <div class="row animate-box">
+                <div class="col-md-6 col-md-offset-3 text-center colorlib-heading">
+                    <h2>Book an Appointment</h2>
+                </div>
+            </div>
+            @using (Html.BeginForm("Appointment", "DoctorProfile", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal" }))
+            {
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2">
+                        <form action="#" class="appointment-wrap animate-box">
+                            <div class="row form-group">
+                                <div class="col-md-6">
+                                    @Html.LabelFor(x => x.Name)
+                                    @Html.TextBoxFor(x => x.Name, new { @class = "form-control", placeholder = "Your first name" })
+                                    @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+                                </div>
+
+                                <div class="col-md-6">
+                                    @Html.LabelFor(x => x.Surname)
+                                    @Html.TextBoxFor(x => x.Surname, new { @class = "form-control", placeholder = "Your last name" })
+                                    @Html.ValidationMessageFor(m => m.Surname, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="row form-group">
+                                <div class="col-md-12">
+                                    @Html.LabelFor(x => x.Mail)
+                                    @Html.TextBoxFor(x => x.Mail, new { @class = "form-control", placeholder = "Your email" })
+                                    @Html.ValidationMessageFor(m => m.Mail, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-md-12">
+                                    @Html.LabelFor(x => x.Mobile)
+                                    @Html.TextBoxFor(x => x.Mobile, new { @class = "form-control", placeholder = "Your phone number" })
+                                    @Html.ValidationMessageFor(m => m.Mobile, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-md-12">
+                                    @Html.LabelFor(x => x.IDNP)
+                                    @Html.TextBoxFor(x => x.IDNP, new { @classx = "form-control", placeholder = "Your phone number" })
+                                    @Html.ValidationMessageFor(m => m.IDNP, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-md-12">
+                                    @Html.LabelFor(x => x.Date)
+                                    @Html.TextBoxFor(x => x.Date, new { @class = "datetimepicker form-control" })
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-md-12">
+                                    @Html.LabelFor(x => x.Message)
+                                    @Html.TextAreaFor(x => x.Message, new { @class = "form-control", placeholder = "Message" })
+                                </div>
+                            </div>
+                            @Html.HiddenFor(x => x.Id)
+                            @Html.HiddenFor(x => x.DoctorId)
+                            <div class="form-group">
+                                <input type="submit" value="Send Message" class="btn btn-primary">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+@*------------------------------------------------------Modal----------------------------------------------*@
+<div class="modal" id="modal-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Diagnosis</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+               Please choose another time.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+@*---------------------------------------------------------------------------------------------------------*@
+
+<button type="button" hidden="hidden" data-toggle="modal" data-target="#modal-1" id="modalButon">Launch modal</button>
+<div class="gototop js-top">
+    <a href="#" class="js-gotop"><i class="icon-arrow-up"></i></a>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.noConflict();
+        var model = @Html.Raw(Json.Encode(Model.WorkingDays));
+        var d = new Date();
+        var year = d.getYear();
+        var month = d.getMonth()+1;
+        var day = d.getDate() + 1;
+
+
+        $('.datetimepicker').datetimepicker({
+            closeOnTimeSelect: true,
+            startTime: '8:00',
+            minTime: '8:00',
+            maxTime: '18:00',
+            defaultTime: '9:00',
+            onChangeDateTime: logic,
+            allowTimes: ['8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'],
+            disabledWeekDays : model,
+            minDate: year + '/' + month + '/' + day,
+
+            onClose: function(dp,$input) {
+                Check();
+            }
+        });
+
+    });
+
+    var hours = []; 
+
+    var logic = function (currentDateTime) {
+        var a = currentDateTime.getDay();
+        var appointment = {
+            "day": new Date(currentDateTime),
+            "DoctorId": $('#DoctorId').val()
+        }
+
+        $.ajax({
+            dataType: "json",
+            type: "post",
+            async: false,
+            contentType: 'application/json; charset=utf-8',
+            url: '@Url.Action("GetWorkingHours", "DoctorProfile")',
+            data: JSON.stringify(appointment),
+            success: function (response) {
+                hours = response;
+            }
+        });
+        if(hours != null)
+            this.setOptions({ allowTimes: hours });
+    };
+
+    function Check() {
+        var a = 1;
+        if (a == 1) {
+            var appointment = {
+                "date": $('#Date').val(),
+                "DoctorId": $('#DoctorId').val()
+            }
+
+            $.ajax({
+                dataType: "json",
+                type: "post",
+                contentType: 'application/json; charset=utf-8',
+                url: '@Url.Action("VerifyDate", "DoctorProfile")',
+                data: JSON.stringify(appointment),
+                success: function(response) {
+                    if (!response) {
+                        console.log("Incorrect data");
+                        document.getElementById("modalButon").click();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    // fires when THIS ajax request returns an error
+                },
+                complete: function(xhr, status) {
+                    // fires when THIS ajax request completes (after success or error)
+                }
+
+            });
+            a++;
+        }
+    };
+    //$('.datetimepicker').change(function (event) {
+    //    event.stopImmediatePropagation();
+    //    Check();
+    //});
+</script>

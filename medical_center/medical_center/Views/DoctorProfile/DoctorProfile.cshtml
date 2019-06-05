@@ -1,0 +1,263 @@
+﻿@using System.Web.DynamicData
+@using System.Web.UI.WebControls
+@using MED.ViewModels
+@using Microsoft.AspNet.Identity
+
+@model  MED.ViewModels.DoctorFormViewModels
+
+<link href="~/Content/font-awesome.css" rel="stylesheet" />
+<link href="~/Content/star-rating.css" rel="stylesheet" />
+<script src="~/Scripts/jquery-3.3.1.js"></script>
+<script src="~/Scripts/star-rating.js"></script>
+
+<link href="http://netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.css" rel="stylesheet">
+
+@{
+    ViewBag.Title = "DoctorProfile";
+}
+
+@if (Model.Id == Guid.Empty)
+{
+    <p>Configure profile page</p>
+    <a href="@Url.Action("DoctorForm", "DoctorProfile", new { UserId = Model.UserId })"> Settings</a>
+}
+else
+{
+    <div class="colorlib-loader"></div>
+
+    <div id="page">
+        <aside id="colorlib-hero" class="hero">
+            <div class="flexslider">
+                <ul class="slides">
+                    <li style="background-image: url('@Url.Content("~"+ @Model.ImagePath)')">
+                    </li>
+                </ul>
+            </div>
+        </aside>
+        <div id="colorlib-appointment">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2 text-center">
+                        <h2 class="line-block">Make an appointment</h2>
+                        @if (User.IsInRole("User"))
+                        {
+                            <p class="line-block"><a href="@Url.Action("Appointment", "DoctorProfile", new {DoctorId = Model.Id})" class="btn btn-primary btn-outline btn-cta">Book an Appointment <i class="icon-calendar3"></i></a></p>
+                        }
+                        else if(!User.Identity.IsAuthenticated)
+                        {
+                            <p class="line-block"><a href="@Url.Action("Register", "Account", new {DoctorId = Model.Id})" class="btn btn-primary btn-outline btn-cta">Book an Appointment <i class="icon-calendar3"></i></a></p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="colorlib-doctor">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-8 image-content">
+                        <div class="doctor animate-box">
+                            <img class="img-responsive doc-img" src="images/img_bg_5.jpg" alt="">
+                            <h2 style="color: cornflowerblue">Dr. @Model.Name @Model.Surname</h2>
+                            @Html.HiddenFor(x => x.Id)
+                            @if (User.IsInRole("Doctor") && User.Identity.GetUserId() == @Model.UserId)
+                            {
+                                <a class="btn btn-primary" href="@Url.Action("DoctorForm", "DoctorProfile", new {UserId = Model.UserId})"><i class="fa fa-cog"></i>Settings</a>
+                                <a class="btn btn-primary" href="@Url.Action("GetAppointments", "DoctorProfile", new {UserId = Model.UserId})"><i class="fa fa-address-book-o"></i>Appointment schedule</a>
+                            }
+                            <span style="font-size: 20px">@Model.Specialty</span>
+
+                            <div class="desc2">
+
+                                <blockquote>
+                                    <p style="font-family: sans-serif; font-style:italic">Consultation: @Model.ConsultationPrice $</p>
+                                </blockquote>
+
+                                <h3>Professional Life</h3>
+                                <p style="font-size: 15px">Experience: @Model.Experience years</p>
+                                <p>@Model.Studies</p>
+
+                            </div>
+                            <div class="contact-info">
+                                <h2>Contacts</h2>
+                                <p><i class="icon-phone-outline"></i> +01-123-456-7890</p>
+                                <p><i class="icon-paperplane"></i>@Model.Mail</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 ">
+                        <div id="sticky_item">
+                            <h3>Doctors Schedule</h3>
+                            @foreach (var item in Model.Schedule)
+                            {
+                                <div class="schedule">
+                                    <span class="icon"><i class="icon-calendar3"></i></span>
+                                    <div class="desc">
+                                        <span>@item.Day</span>
+                                        <span>@Html.DisplayFor(x => @item.WorkStart)  -  @Html.DisplayFor(x => @item.WorkEnd)</span>
+
+                                        <span>Lunch:  @Html.DisplayFor(x => @item.LunchStart)  -  @Html.DisplayFor(x => @item.LunchEnd)</span>
+                                    </div>
+                                </div>
+                            }
+                            @if (User.IsInRole("Doctor") && User.Identity.GetUserId() == @Model.UserId)
+                            {
+                                <div class="form-group">
+                                    <a class="btn btn-primary" href="@Url.Action("DoctorSchedule", "DoctorProfile", new { UserId = Model.UserId })">Edit Schedule</a>
+                                </div>
+                            }
+                            @if (User.IsInRole("User"))
+                            {
+                                <p class="btn-big"><a href="@(Url.Action("Appointment", "DoctorProfile", new {DoctorId = Model.Id}))" class="btn btn-primary">Make an Appoinment</a></p>
+                            }
+                            else if (!User.Identity.IsAuthenticated)
+                            {
+                                <p class="btn-big"><a href="@(Url.Action("Register", "Account", new {DoctorId = Model.Id}))" class="btn btn-primary">Make an Appoinment</a></p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (!User.IsInRole("Doctor") && User.Identity.IsAuthenticated)
+        {
+            <div class="row">
+                <div class="comment-wrap">
+                    <div class="col-sm-1">
+                        <div class="thumbnail">
+                            @if (Model.PatientImage != null)
+                            {
+                                <img src="@String.Format("data:image/png;base64,{0}", Convert.ToBase64String(Model.PatientImage))" width="80px" height="80px"/>
+                            }
+                            else
+                            {
+                                <img id="profileImg" src="~/assets/avatar.png" alt ="No image" width = "80px" height = "80px" />
+                            }
+                        </div>
+                    </div>
+                    <div class="col-sm-11">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <span class="text-muted">Add comment</span>
+                                <input id="input-id" type="text" class="rating" data-size="xs">
+                            </div>
+                            <div class="panel-body">
+                                @Html.TextAreaFor(x => x.Review, new {style = "width : 100%"})
+                                @Html.HiddenFor(x => x.Rating, new {id = "reviewId"})
+                                <button class="btn btn-primary" id="post"> Post Comment</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        
+        @foreach (var item in Model.Reviews)
+        {
+            <div class="row">
+                <div class="comment-wrap">
+                    <div class="col-sm-1">
+                        <div class="thumbnail">
+                            @if (item.PatientImage != null )
+                            {
+                                <img src="@String.Format("data:image/png;base64,{0}", Convert.ToBase64String(item.PatientImage))" width="80px" height="80px" />
+                            }
+                            else
+                            {
+                                <img id="profileImg" src="~/assets/avatar.png" alt="No image" width="80" height="80" />
+                            }
+                        </div>
+                    </div>
+                    <div class="col-sm-11">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                @{ var time = DateTime.Today - item.CreateTime;}
+                                
+                                @Html.HiddenFor(x => time)
+                                @if (item.CreateTime.Date == DateTime.Now.Date && item.CreateTime.Year == DateTime.Now.Year && item.CreateTime.Month == DateTime.Now.Month)
+                                {
+                                    <strong>@item.PatientName</strong>
+                                    <span class="text-muted">Commented today</span>
+                                }
+
+                                else
+                                {
+                                    <strong>@item.PatientName</strong>
+                                    <span class="text-muted">Commented @time.Days days ago</span>
+                                }
+
+                                @Html.HiddenFor(x => item.Rating, new {id = @item.Id, @class = "review"})
+
+                                <input id="input2-id" hidden="hidden" type="text" class="rating2 @item.Id" data-size="xs">
+                            </div>
+                            <div class="panel-body">
+                                @Html.DisplayFor( x => item.Review, new{style= "width : 100%"})
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+    <div class="gototop js-top">
+        <a href="#" class="js-gotop"><i class="icon-arrow-up"></i></a>
+    </div>
+}
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $.noConflict();
+            var rating = 0;
+
+            $('#input-id').rating();
+
+            $('#input-id').on('rating:change', function (event, value, caption) {
+                $('#reviewId').val(value);
+            });
+
+            $('.rating2').each(function () {
+                
+                var a = $(this).attr('class').split(' ')[1].toString();
+                $('.review').each(function() {
+                    if ($(this).attr('id') == a) {
+                        console.log(a);
+                        $(this).rating('refresh',
+                            {
+                                disabled: true,
+                                showClear: false,
+                                showCaption: true,
+                                size: 'xs'
+                            });
+                        }
+                    })
+                });
+
+            $('#PostComment').click(function () {
+                var review = {
+                }
+            });
+            $('#post').click(function () {
+                var review = {
+                    DoctorId: $('#Id').val(),
+                    Rating: $('#reviewId').val(),
+                    Review: $('#Review').val()
+                }
+
+                $.ajax({
+                    dataType: "json",
+                    contentType: 'application/json; charset=utf-8',
+                    type: "post",
+                    url: '@Url.Action("AddReview", "DoctorProfile")',
+                    data: JSON.stringify(review),
+                    success: function(res) {
+                        window.location.href = res.newUrl;
+                    },
+                    error: function(res) {
+                        window.location.href = res.newUrl;
+                    }
+                });
+
+            });
+        });
+    </script>

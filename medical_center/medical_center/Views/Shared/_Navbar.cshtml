@@ -1,0 +1,107 @@
+﻿@using Microsoft.AspNet.Identity
+
+@{
+    ViewBag.Title = "_Navbar";
+}
+
+<nav class="colorlib-nav" role="navigation">
+    <div class="top-menu">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="top">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div id="colorlib-logo"><a href="index.html"><i class="flaticon-stethoscope"></i>Medi<span>care</span></a></div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="num">
+                                    <span class="icon"><i class="icon-phone"></i></span>
+                                    <p><a href="#">111-222-333</a><br><a href="#">99-222-333</a></p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="loc">
+                                    <span class="icon"><i class="icon-location"></i></span>
+                                    <p><a href="#">str. Puskin 4, or. Chisinau</a></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="menu-wrap">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-8">
+                        <div class="menu-1">
+                            <ul>
+                                <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                                <li>@Html.ActionLink("Doctors", "DoctorList", "DoctorProfile")</li>
+                                @if (User.IsInRole("Doctor"))
+                                {
+                                    <li>@Html.ActionLink("Patients", "PatientList", "PatientForm")</li>
+
+                                }
+                                <li>@Html.ActionLink("Contacts", "Contact", "Home")</li>
+                                <li>@Html.ActionLink("About", "About", "Home")</li>
+                                @if (Request.IsAuthenticated)
+                                {
+                                    if (User.IsInRole("Admin"))
+                                    {
+                                        <li class="nav-item dropdown ">
+                                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Manage Doctors</a>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" style ="color: #3c97e8" href="@Url.Action("RegisterDoctor", "Admin")">Register Doctor</a>
+                                                <a class="dropdown-item" style ="color: #3c97e8"  href="@Url.Action("GetAllDoctors", "Admin")">Doctor List</a>
+                                            </div>
+                                        </li>
+
+                                        @*<li> @Html.ActionLink("Register doctor", "RegisterDoctor", "Admin", null, new { @class = "dropdown-item" })</li>
+                                        <li> @Html.ActionLink("Doctor List", "GetAllDoctors", "Admin", null, new { @class = "dropdown-item" })</li>*@
+
+                                    }
+                                    else if (User.IsInRole("Doctor"))
+                                    {
+                                    <li>   @Html.ActionLink("My Profile", "Profile", "DoctorProfile", new { @UserId = User.Identity.GetUserId() }, new { @class = "nav-link" })</li>
+                                    }
+                                    else
+                                    {
+                                    <li> @Html.ActionLink("My Profile", "PatientProfile", "PatientForm", new { @UserId = User.Identity.GetUserId() }, new { @class = "nav-link" })</li>
+                                    }
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        @if (Request.IsAuthenticated)
+                        {
+                            using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+                            {
+                                @Html.AntiForgeryToken()
+
+                                <ul class="nav navbar-nav navbar-right">
+                                    <li>
+                                        <a href="@Url.Action("Index", "Manage")" title="Manage">Hello <span style="font-weight: bold">@User.Identity.GetUserName().Split('@')[0]</span></a>
+                                        @*Hello @Html.ActionLink(User.Identity.GetUserName().Split('@')[0], "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })*@
+                                    </li>
+                                    <li><a href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>
+                                </ul>
+                            }
+                        }
+                        else
+                        {
+                            <ul class="nav navbar-nav navbar-right">
+                                <li>@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>
+                                <li>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
+                            </ul>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+

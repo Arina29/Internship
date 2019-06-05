@@ -1,0 +1,62 @@
+﻿@model System.Collections.Generic.List<MED.DAL.Models.Patient>
+
+<style>
+    th {
+        text-align: center;
+    }
+    td {
+        text-align: center;
+    }
+</style>
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Patients</title>
+    </head>
+<body>
+<br/>
+<div class="col-sm " align="right">
+    @using (Html.BeginForm("SearchPatient", "DoctorProfile"))
+    {
+        @Html.TextBox("SearchString", null, new {@placeholder = "Enter Client IDNP"})
+        <input type="submit" value="Search" class="btn btn-secondary" height="2em"/>
+    }
+</div>
+<br/>
+<table id="movies" class="table table-hover">
+    <thead>
+    <tr >
+        <th scope="col" id="name">Name</th>
+        <th scope="col" id="director">Surname</th>
+        <th scope="col">IDNP</th>
+        <th scope="col" id="reserve">View</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var patient in Model)
+    {
+        <tr>
+            <td>
+                @patient.Name
+            </td>
+
+            <td>
+                @patient.Surname
+            </td>
+
+            <td>
+                @patient.IDNP
+            </td>
+
+            <td>
+                @Html.ActionLink("View Profile", "PatientProfile", "PatientForm", new {UserId = patient.UserId}, new {@class = "btn btn-primary"})
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+
+</body>
+</html>
