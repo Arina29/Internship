@@ -4,7 +4,7 @@ using System.Web;
 using System.Web.Mvc;
 using MED.DAL.Models;
 using MED.Presentation.App_Start;
-using MED.Presentation.ViewModels;
+using MED.Presentation.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;

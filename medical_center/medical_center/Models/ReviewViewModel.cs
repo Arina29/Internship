@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MED.Presentation.ViewModels
+namespace MED.Presentation.Models
 {
     public class ReviewViewModel
     {

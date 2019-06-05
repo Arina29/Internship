@@ -7,7 +7,7 @@ using AutoMapper;
 using MED.DAL.Models;
 using MED.DAL.UnitOfWork;
 using MED.Presentation.App_Start;
-using MED.Presentation.ViewModels;
+using MED.Presentation.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;

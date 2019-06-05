@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MED.Presentation.ViewModels
+namespace MED.Presentation.Models
 {
     public class MedicalBookViewModel
     {

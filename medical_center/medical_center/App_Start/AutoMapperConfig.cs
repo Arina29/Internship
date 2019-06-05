@@ -1,7 +1,7 @@
 ﻿using System;
 using AutoMapper;
 using MED.DAL.Models;
-using MED.Presentation.ViewModels;
+using MED.Presentation.Models;
 
 namespace MED.Presentation.App_Start
 {

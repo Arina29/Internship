@@ -6,8 +6,8 @@ using AutoMapper;
 using MED.BLL.Implimentation;
 using MED.DAL.Models;
 using MED.DAL.UnitOfWork;
+using MED.Presentation.Models;
 using MED.Presentation.Utils;
-using MED.Presentation.ViewModels;
 using Microsoft.AspNet.Identity;
 
 namespace MED.Presentation.Controllers

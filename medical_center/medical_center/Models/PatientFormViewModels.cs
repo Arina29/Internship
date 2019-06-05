@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Web;
 using MED.DAL.Models;
 
-namespace MED.Presentation.ViewModels
+namespace MED.Presentation.Models
 {
     public class PatientFormViewModels
     {
